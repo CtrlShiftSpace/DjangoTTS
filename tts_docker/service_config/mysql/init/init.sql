@@ -1,0 +1,2 @@
+# 建立所需資料庫
+CREATE DATABASE IF NOT EXISTS `tts`;

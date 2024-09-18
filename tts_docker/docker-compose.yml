@@ -1,0 +1,88 @@
+version: "3"
+
+networks:
+  nginx_network:
+    driver: bridge
+  db_network:
+    driver: bridge
+  redis_network:
+    driver: bridge
+
+services:
+  redis:
+    image: redis:latest
+    command: redis-server /etc/redis/redis.conf # 當container啟動時，自動啟動redus服務
+    networks:
+      - redis_network
+    volumes:
+      - ./service_volumes/redis:/data # redis資料
+      - ./service_config/redis/redis.conf:/etc/redis/redis.conf # redis設定檔
+    ports:
+      - "6379:6379"
+    restart: always # always 為當啟動過程發生錯誤時則持續重啟
+
+  db:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_USER=
+      - MYSQL_PASSWORD=
+    networks:
+      - db_network
+    volumes:
+      - ./service_volumes/db:/var/lib/mysql:rw # mysql資料庫資料
+      - ./service_config/mysql/conf/my.cnf:/etc/mysql/my.cnf # mysql資料庫設定檔
+      - ./service_config/mysql/init:/docker-entrypoint-initdb.d/ # 初始執行sql檔案
+    ports:
+      - "3306:3306" # 和 my.cnf 的port 一致
+    restart: always
+
+  # phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - nginx_network
+      - db_network
+    restart: always
+
+  # tts 網站 (Django)
+  django-tts:
+    build: ../tts
+    expose:
+      - "8000"
+    volumes:
+      - ../tts:/var/www/html/tts # 專案目錄
+      - ./service_config/uwsgi/tts:/tmp # 紀錄uwsgi日誌資料
+    networks:
+      - nginx_network
+      - db_network
+      - redis_network
+    depends_on:
+      - db
+      - redis
+    restart: always
+    tty: true
+    stdin_open: true
+
+  nginx:
+    build: ./service_config/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "80"
+    volumes:
+      - ./service_config/nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf # nginx設定檔
+      - ./service_config/nginx/ssl:/usr/share/nginx/ssl # ssl 設定
+      - ./service_config/nginx/log:/var/log/nginx # nginx 日誌
+      # tts 網站
+      - ../tts/static:/usr/share/nginx/html/tts/static # static靜態檔案
+    networks:
+      - nginx_network
+    depends_on:
+      - django-tts
+    restart: always

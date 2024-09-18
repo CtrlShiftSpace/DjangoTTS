@@ -1,0 +1,7 @@
+pipreqs
+django
+edge_tts
+# uwsgi
+uwsgi
+mysqlclient
+python-dotenv

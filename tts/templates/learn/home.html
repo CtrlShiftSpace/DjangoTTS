@@ -12,6 +12,9 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
         <!-- Jquery -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <!-- font-awesome -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
         <!-- CSS -->
         <link href="{% static 'css/learn.css' %}" rel="stylesheet">
         <script src="{% static 'js/learn.js' %}"></script>
@@ -42,34 +45,28 @@
         </div>
 
         <div class="p-3">
-            <table class="table table-striped">
+            <table id="word-catch-table" class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">First</th>
-                        <th scope="col">Last</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col">單字</th>
+                        <th scope="col">念法</th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for word_row in eng_words %}
                     <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
+                        <th scope="row">{{forloop.counter}}</th>
+                        <td>{{ word_row.word }}</td>
+                        <td style="cursor:pointer;">
+                            <span class="btn-word-repeat" data-word="{{ word_row.word }}" >
+                                <i class="fa-solid fa-volume-high"></i>
+                            </span>
+                        </td>
+                        <td></td>
                     </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

@@ -1,6 +1,8 @@
 $(document).ready(function (){
     // 按下聆聽按鈕
-    $("#btn-trans-audio").on('click', transAudioHandler);
+    $('#btn-trans-audio').on('click', transAudioHandler);
+    // 按下單字旁的念法
+    $('#word-catch-table').on('click', '.btn-word-repeat', repeatWordHandler);
 });
 
 function transAudioHandler(e) {
@@ -9,7 +11,17 @@ function transAudioHandler(e) {
     if (comm_text.trim() == "") {
         return;
     }
+}
 
+function repeatWordHandler(e) {
+    let comm_text = $(this).attr("data-word");
+    if (comm_text.trim() == "") {
+        return;
+    }
+    ajaxEdgeTTS(comm_text);
+}
+
+function ajaxEdgeTTS(comm_text) {
     $.ajax({
         type: 'POST',
         url: "/api/edge/tts",
